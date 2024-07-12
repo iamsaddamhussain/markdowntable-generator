@@ -1,72 +1,32 @@
 <template>
   <q-page class="q-pa-sm q-ml-xl">
     <div class="row">
-      <q-markup-table separator="vertical">
+      <q-markup-table separator="vertical" class="col-10">
         <thead>
           <tr>
-            <th class="text-left">A</th>
-            <th class="text-right">B</th>
-            <th class="text-right">C</th>
-            <th class="text-right">D</th>
-            <th class="text-right">E</th>
-            <th class="text-right">F</th>
+            <th></th>
+            <th class="text-left" v-for="(column, index) in columns" :key="index">{{ column }}</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td class="text-left">1</td>
-            <td class="text-right">34</td>
-            <td class="text-right">6</td>
-            <td class="text-right">24</td>
-            <td class="text-right">4</td>
-            <td class="text-right">87</td>
-          </tr>
-          <tr>
-            <td class="text-left">2</td>
-            <td class="text-right">237</td>
-            <td class="text-right">9</td>
-            <td class="text-right">37</td>
-            <td class="text-right">4.3</td>
-            <td class="text-right">129</td>
-          </tr>
-          <tr>
-            <td class="text-left">3</td>
-            <td class="text-right">262</td>
-            <td class="text-right">16</td>
-            <td class="text-right">23</td>
-            <td class="text-right">6</td>
-            <td class="text-right">337</td>
-          </tr>
-          <tr>
-            <td class="text-left">4</td>
-            <td class="text-right">305</td>
-            <td class="text-right">3.7</td>
-            <td class="text-right">67</td>
-            <td class="text-right">4.3</td>
-            <td class="text-right">413</td>
-          </tr>
-          <tr>
-            <td class="text-left">5</td>
-            <td class="text-right">356</td>
-            <td class="text-right">16</td>
-            <td class="text-right">49</td>
-            <td class="text-right">3.9</td>
-            <td class="text-right">327</td>
+          <tr v-for="(number, rowIndex) in numbers" :key="rowIndex">
+            <td class="text-left">{{ number.id }}</td>
+            <td class="text-left" v-for="(column, colIndex) in columns" :key="colIndex">
+              <q-input filled dense v-model="numbers[rowIndex][column]" />
+            </td>
           </tr>
         </tbody>
       </q-markup-table>
     </div>
-    <div class="row q-mt-md">
-      <q-btn color="purple" label="Generate" />
+    <div class="row q-mt-md col-10">
+      <div class="col-9"></div>
+      <div class="col-3 justify-end">
+        <q-btn color="purple" no-caps icon="settings_suggest" label="Generate" @click="generateMarkDown" />
+      </div>
     </div>
 
     <div class="row q-mt-md">
-      <div class="code-editor">
-        <div class="line-numbers">
-          <pre>{{ lineNumbers }}</pre>
-        </div>
-        <textarea v-model="codeSnippet" @input="updateLineNumbers" class="code-input" rows="10"></textarea>
-      </div>
+      <q-input filled type="textarea" class="col-10" v-model="generatedContent" />
     </div>
   </q-page>
 </template>
@@ -78,37 +38,22 @@ defineOptions({
   name: 'IndexPage'
 });
 
-const codeSnippet = ref('')
-const lineNumbers = ref('1\n')
+const columns = ref(['A', 'B', 'C', 'D', 'E', 'F'])
+const numbers = ref(initialiseNumber(5))
+const generatedContent = ref('')
 
-function updateLineNumbers() {
-  const lines = codeSnippet.value.split('\n').length;
-  lineNumbers.value = Array.from({ length: lines }, (_, i) => i + 1).join('\n') + '\n';
+function initialiseNumber(rowCount) {
+  return Array.from({ length: rowCount }, (_, index) => {
+    const row = { id: index + 1 };
+    columns.value.forEach(column => {
+      row[column] = ''
+    })
+    return row
+  })
 }
+
+function generateMarkDown() {
+  generatedContent.value = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur a interdum dui, eget faucibus massa. Praesent sed lorem eu eros sagittis cursus ac non justo. Suspendisse convallis, purus vel tristique eleifend, urna quam vulputate augue, at consectetur nunc ex sed enim. Nulla facilisi. Donec dapibus, leo id venenatis fringilla, eros turpis consequat est, eu congue justo massa id elit. Nulla non quam id libero tempus bibendum vel vitae odio. Interdum et malesuada fames ac ante ipsum primis in faucibus. Aliquam quis lacus nec sapien eleifend dictum. Vivamus ante lorem, maximus quis dictum sit amet, sodales id turpis. Maecenas consequat risus ut est sollicitudin, id congue eros interdum. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.';
+}
+
 </script>
-
-<style scoped>
-.code-editor {
-  display: flex;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.line-numbers {
-  background-color: #f0f0f0;
-  padding: 8px;
-  text-align: right;
-  color: #666;
-  user-select: none;
-}
-
-.code-input {
-  flex-grow: 1;
-  border: none;
-  padding: 8px;
-  resize: none;
-  outline: none;
-  font-family: monospace;
-}
-</style>
